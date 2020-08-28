@@ -1,0 +1,11 @@
+gensim        
+jieba           
+nltk            
+numpy         
+Pillow          
+scikit-learn    
+scipy           
+tensorboardX    
+torch           
+torchvision     
+tqdm 
