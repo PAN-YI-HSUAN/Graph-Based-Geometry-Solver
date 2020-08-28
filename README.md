@@ -20,5 +20,9 @@
 │   │   ├── run_seq2tree.py
 │   │   └── src
 │   └── Data_processing
+│       ├── Data
+│       ├── geometry_mwps_filter.py
+│       ├── parse_for_sentence.py
+│       └── problem_type_analysis.ipynb
 └──
 ```
