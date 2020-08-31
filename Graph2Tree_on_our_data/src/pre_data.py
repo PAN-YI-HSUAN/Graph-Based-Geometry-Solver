@@ -30,6 +30,18 @@ class Lang:
             else:
                 self.word2count[word] += 1
 
+    def add_sen_to_vocab_test(self, sentence):  # add words of sentence to vocab
+        for word in sentence:
+            if re.search("N\d+|NUM|\d+", word):
+                continue
+            if word not in self.index2word:
+                self.word2index[word] = self.n_words
+                self.word2count[word] = 5
+                self.index2word.append(word)
+                self.n_words += 1
+            else:
+                self.word2count[word] += 5
+
     def trim(self, min_count):  # trim words below a certain count threshold
         keep_words = []
 
@@ -268,7 +280,7 @@ def load_roth_data(filename):  # load the json data to dict(dict()) for roth dat
 
 def transfer_num(data):  # transfer num into "NUM"
     print("Transfer numbers...")
-    pattern = re.compile("\d*\(\d+/\d+\)\d*|\d+\.\d+%?|\d+%?")
+    pattern = re.compile("\d*\(*\d+/\d+\)*\d*|\d+\.\d+%?|\d+%?")
     pairs = []
     generate_nums = []
     generate_nums_dict = {}
@@ -294,7 +306,7 @@ def transfer_num(data):  # transfer num into "NUM"
         nums_fraction = []
 
         for num in nums:
-            if re.search("\d*\(\d+/\d+\)\d*", num):
+            if re.search("\d*\(*\d+/\d+\)*\d*", num):
                 nums_fraction.append(num)
         nums_fraction = sorted(nums_fraction, key=lambda x: len(x), reverse=True)
 
@@ -355,7 +367,7 @@ def transfer_num(data):  # transfer num into "NUM"
 
 def transfer_num_test(data):  # transfer num into "NUM"
     print("Transfer numbers...")
-    pattern = re.compile("\d*\(\d+/\d+\)\d*|\d+\.\d+%?|\d+%?")
+    pattern = re.compile("\d*\(*\d+/\d+\)*\d*|\d+\.\d+%?|\d+%?")
     pairs = []
     generate_nums = []
     generate_nums_dict = {}
@@ -381,7 +393,7 @@ def transfer_num_test(data):  # transfer num into "NUM"
         nums_fraction = []
 
         for num in nums:
-            if re.search("\d*\(\d+/\d+\)\d*", num):
+            if re.search("\d*\(*\d+/\d+\)*\d*", num):
                 nums_fraction.append(num)
         nums_fraction = sorted(nums_fraction, key=lambda x: len(x), reverse=True)
 
@@ -727,6 +739,15 @@ def prepare_data(pairs_trained, pairs_tested, trim_min_count, generate_nums, cop
         elif pair[-1]:
             input_lang.add_sen_to_vocab(pair[0])
             output_lang.add_sen_to_vocab(pair[1])
+    '''
+    for pair in pairs_tested:
+        if not tree:
+            input_lang.add_sen_to_vocab_test(pair[0])
+            output_lang.add_sen_to_vocab_test(pair[1])
+        elif pair[-1]:
+            input_lang.add_sen_to_vocab_test(pair[0])
+            output_lang.add_sen_to_vocab_test(pair[1])
+    '''
     input_lang.build_input_lang(trim_min_count)
     if tree:
         output_lang.build_output_lang_for_tree(generate_nums, copy_nums)
@@ -886,11 +907,16 @@ def pad_seq(seq, seq_len, max_length):
 def change_num(num):
     new_num = []
     for item in num:
-        if '/' in item:
+        if '/' in item and ')' in item:
             new_str = item.split(')')[0]
             new_str = new_str.split('(')[1]
             a = float(new_str.split('/')[0])
             b = float(new_str.split('/')[1])
+            value = a/b
+            new_num.append(value)
+        elif '/' in item:
+            a = float(item.split('/')[0])
+            b = float(item.split('/')[1])
             value = a/b
             new_num.append(value)
         elif '%' in item:

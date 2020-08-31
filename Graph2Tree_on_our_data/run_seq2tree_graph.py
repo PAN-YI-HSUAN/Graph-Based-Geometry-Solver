@@ -99,7 +99,7 @@ group_data = read_json("data/Math_23K_processed.json")
 data = load_raw_data("data/Math_23K.json")
 
 data_test = read_json('data/geometry_mwps.json')
-group_data_test = read_json('data/fgeometry_mwps_processed.json')
+group_data_test = read_json('data/geometry_mwps_processed.json')
 data_test = get_segmented(data_test)
 
 pairs, generate_nums, copy_nums = transfer_num(data)
@@ -113,6 +113,11 @@ temp_pairs = []
 for p in pairs:
     temp_pairs.append((p[0], from_infix_to_prefix(p[1]), p[2], p[3]))
 pairs = temp_pairs
+
+temp_pairs = []
+for p in pairs_test:
+    temp_pairs.append((p[0], from_infix_to_prefix(p[1]), p[2], p[3]))
+pairs_test = temp_pairs
 
 train_fold, test_fold, valid_fold = get_train_test_fold(ori_path,prefix,data,pairs,group_data)
 
